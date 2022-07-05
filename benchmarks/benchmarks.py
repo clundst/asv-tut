@@ -1,12 +1,34 @@
 # Write the benchmarking functions here.
 # See "Writing benchmarks" in the asv docs for more information.
 
+import time, os
+
+import awkward as ak
+import hist
+import matplotlib.pyplot as plt
+import numpy as np
+from coffea import processor
+from coffea.nanoevents import schemas
 
 class TimeSuite:
-    """
-    An example benchmark that times the performance of various kinds
-    of iterating over dictionaries in Python.
-    """
+    fileset = {'SingleMu' : ["root://eospublic.cern.ch//eos/root-eos/benchmark/Run2012B_SingleMu.root"]}
+    def time_Q1(self):
+        def process(self, events):
+            return (
+                hist.Hist.new.Reg(100, 0, 200, name="met", label="$E_{T}^{miss}$ [GeV]")
+                .Double()
+                .fill(events.MET.pt)
+            )
+        def postprocess(self, accumulator):
+            return accumulator
+    executor = processor.IterativeExecutor()
+    run = processor.Runner(executor=executor,
+                       schema=schemas.NanoAODSchema,
+                       savemetrics=True,
+                       chunksize=2**19,
+                      )
+
+
     def setup(self):
         self.d = {}
         for x in range(500):
