@@ -86,6 +86,7 @@
     //
     "matrix": {
          "req": {
+	     "distributed": [],
              "xrootd": [],
 	     "psutil": [],
              "tqdm": []
