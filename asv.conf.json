@@ -86,10 +86,12 @@
     //
     "matrix": {
          "req": {
+	     "blosc": [],
+	     "cloudpickle": ["2.0.0"],
 	     "distributed": [],
              "xrootd": [],
 	     "psutil": [],
-             "tqdm": []
+             "tqdm": [],
          },
     //     "env": {"ENV_VAR_1": ["val1", "val2"]},
     //     "env_nobuild": {"ENV_VAR_2": ["val3", null]},
