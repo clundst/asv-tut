@@ -1,11 +1,3 @@
-#def time_range(n):
-#    for i in range(n):
-#        pass
-#time_range.params = [10, 100, 1000, 100000]
-
-# Write the benchmarking functions here.
-# See "Writing benchmarks" in the asv docs for more information.
-
 import time, os
 
 import awkward as ak
