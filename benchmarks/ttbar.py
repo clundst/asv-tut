@@ -3,7 +3,7 @@ import time
 import logging
 import vector; vector.register_awkward()
 import awkward as ak
-import cabinetry
+#import cabinetry
 from coffea import processor
 from coffea.processor import servicex
 from coffea.nanoevents import transforms
@@ -17,7 +17,7 @@ import numpy as np
 import uproot
 import utils
 
-logging.getLogger("cabinetry").setLevel(logging.INFO)
+#logging.getLogger("cabinetry").setLevel(logging.INFO)
 
 PIPELINE = "coffea"
 USE_DASK = True

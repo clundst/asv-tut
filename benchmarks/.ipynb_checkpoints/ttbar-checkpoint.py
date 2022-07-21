@@ -1,7 +1,6 @@
 import asyncio
 import time
 import logging
-import vector; vector.register_awkward()
 import awkward as ak
 import cabinetry
 from coffea import processor

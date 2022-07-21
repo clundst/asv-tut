@@ -26,7 +26,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -49,7 +49,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -72,7 +72,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
 
@@ -97,7 +97,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -129,7 +129,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -176,7 +176,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -211,7 +211,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
         run = processor.Runner(executor=executor,
@@ -264,7 +264,7 @@ class TimeSuite:
         if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
             from dask.distributed import Client
             client = Client("tls://localhost:8786")
-            executor = processor.DaskExecutor(client=client,status=False)
+            executor = processor.DaskExecutor(client=client)
         else:
             executor = processor.IterativeExecutor()
 
