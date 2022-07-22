@@ -8,9 +8,10 @@ from coffea import processor
 from coffea.nanoevents import schemas
 
 fileset = {'SingleMu' : ["root://eospublic.cern.ch//eos/root-eos/benchmark/Run2012B_SingleMu.root"]}
+
 class Suite:
     timeout = 1200.00
-    def TrackQ1(self, n):
+    def setup_cache(self):
         class Q1Processor(processor.ProcessorABC):
             def process(self, events):
                 return (
@@ -29,10 +30,10 @@ class Suite:
             executor = processor.IterativeExecutor()
             #executor = processor.FuturesExecutor(workers=ncores, status=False)
         run = processor.Runner(executor=executor,
-                       schema=schemas.NanoAODSchema,
-                       savemetrics=True,
-                       chunksize=n,
-                      )
+                            schema=schemas.NanoAODSchema,
+                            savemetrics=True,
+                            chunksize=2**19,
+                            )
         tic = time.monotonic()
         output, metrics = run(fileset, "Events", processor_instance=Q1Processor())
         workers = len(client.scheduler_info()['workers'])
@@ -40,16 +41,22 @@ class Suite:
         toc = time.monotonic()
         walltime = toc - tic
         ave_num_threads = metrics['processtime']/(tic-toc)
-        TrackThreads(ave_num_threads)
-
-
-
+        with open("test.dat", "w") as fd:
+            fd.write('{0}\n'.format(walltime))
+            
+    def setup(self):
+        with open("test.dat", "r") as fd:
+            self.data = [float(x) for x in fd.readlines()]
+            
+    #setup.params = ([2 ** 17, 2 ** 18, 2 ** 19])
+    #setup.param_names = ['walltime per CPU per chunksize']
+    def TrackWalltime(self):
+        return self.data[0]
+    
         #len(metrics['columns']) == number columns
         #metrics['chunks'] == number of chunks ran over
         #metrics['bytesread'] == size read
-        return walltime/(2*workers)
-    TrackQ1.params = ([2 ** 17, 2 ** 18, 2 ** 19])
-    TrackQ1.param_names = ['walltime per CPU per chunksize']
+        #return walltime/(2*workers)
     
-    def TrackThreads(ave_num_threads):
-        return ave_num_threads
+    #def TrackThreads(self):
+        #return ave_num_threads
