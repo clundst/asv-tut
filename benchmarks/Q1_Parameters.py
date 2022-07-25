@@ -1,17 +1,19 @@
 import time, os
-
 import awkward as ak
 import hist
 import matplotlib.pyplot as plt
 import numpy as np
 from coffea import processor
 from coffea.nanoevents import schemas
+import pickle
 
 fileset = {'SingleMu' : ["root://eospublic.cern.ch//eos/root-eos/benchmark/Run2012B_SingleMu.root"]}
 
 class Suite:
     timeout = 1200.00
-    def setup_cache(self):
+    params = ([2 ** 17, 2 ** 18, 2 ** 19])
+
+    def setup(self,n):
         class Q1Processor(processor.ProcessorABC):
             def process(self, events):
                 return (
@@ -32,7 +34,7 @@ class Suite:
         run = processor.Runner(executor=executor,
                             schema=schemas.NanoAODSchema,
                             savemetrics=True,
-                            chunksize=2**19,
+                            chunksize=n,
                             )
         tic = time.monotonic()
         output, metrics = run(fileset, "Events", processor_instance=Q1Processor())
@@ -40,23 +42,46 @@ class Suite:
         print('workers = ', workers, ' cores = ', 2*workers)
         toc = time.monotonic()
         walltime = toc - tic
-        ave_num_threads = metrics['processtime']/(tic-toc)
-        with open("test.dat", "w") as fd:
-            fd.write('{0}\n'.format(walltime))
-            
-    def setup(self):
-        with open("test.dat", "r") as fd:
-            self.data = [float(x) for x in fd.readlines()]
-            
-    #setup.params = ([2 ** 17, 2 ** 18, 2 ** 19])
-    #setup.param_names = ['walltime per CPU per chunksize']
-    def TrackWalltime(self):
-        return self.data[0]
-    
-        #len(metrics['columns']) == number columns
-        #metrics['chunks'] == number of chunks ran over
-        #metrics['bytesread'] == size read
-        #return walltime/(2*workers)
-    
-    #def TrackThreads(self):
-        #return ave_num_threads
+        ave_num_threads = metrics['processtime']/(toc-tic)
+        metrics['walltime']=walltime
+        metrics['ave_num_threads']=ave_num_threads
+        metrics['chunksize'] = n
+        with open('output.pickle', 'wb') as fd:
+            pickle.dump(metrics, fd, protocol=pickle.HIGHEST_PROTOCOL)
+        return fd
+ 
+    def TrackWalltime(self,n):
+        with open('output.pickle', 'rb') as fd:
+                 run_data = pickle.load(fd)
+        return run_data['walltime']
+    TrackWalltime.param_names = ['Walltime']
+
+    def TrackThreadcount(self,n):
+        with open('output.pickle', 'rb') as fd:
+            run_data = pickle.load(fd)
+        return run_data['ave_num_threads']
+    TrackThreadcount.param_names = ['Average Number of Threads']
+
+    def TrackBytes(self, n):
+        with open('output.pickle', 'rb') as fd:
+            run_data = pickle.load(fd)
+        return run_data['bytesread']/run_data['walltime']
+    TrackBytes.param_names = ['Bytes per Second']
+
+    def TrackChunksize(self, n):
+        with open('output.pickle', 'rb') as fd:
+            run_data = pickle.load(fd)
+        return run_data['chunksize']/run_data['walltime']
+    TrackChunksize.param_names = ['Chunksize per Second']
+
+    def TrackBytesPerThread(self, n):
+        with open('output.pickle', 'rb') as fd:
+            run_data = pickle.load(fd)
+        return (run_data['bytesread']/run_data['walltime'])/run_data['ave_num_threads']
+    TrackBytesPerThread.param_names = ['Bytes per Thread']
+
+    def TrackChunksizePerThread(self, n):
+        with open('output.pickle', 'rb') as fd:
+            run_data = pickle.load(fd)
+        return (run_data['chunksize']/run_data['walltime'])/run_data['ave_num_threads']
+    TrackChunksizePerThread.param_names = ['Chunksize per Thread']
