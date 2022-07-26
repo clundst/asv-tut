@@ -3,7 +3,7 @@ import time
 import logging
 import vector; vector.register_awkward()
 import awkward as ak
-#import cabinetry
+import cabinetry
 from coffea import processor
 from coffea.processor import servicex
 from coffea.nanoevents import transforms
@@ -17,7 +17,7 @@ import numpy as np
 import uproot
 import utils
 
-#logging.getLogger("cabinetry").setLevel(logging.INFO)
+logging.getLogger("cabinetry").setLevel(logging.INFO)
 
 PIPELINE = "coffea"
 USE_DASK = True
@@ -209,11 +209,13 @@ if PIPELINE == "servicex_databinder":
 
     
 
-N_FILES_MAX_PER_SAMPLE = n
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False)
 class Suite:
     timeout = 1200.00
-    def TrackQ1(self, n):
+    params = ([10, 100, 500, 1000, -1])
+
+    def setup(self, n):
+        N_FILES_MAX_PER_SAMPLE = n
+        fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False)
         class Q1Processor(processor.ProcessorABC):
             t0 = time.time()
             if PIPELINE == "coffea":
@@ -233,16 +235,25 @@ class Suite:
             elif PIPELINE == "servicex_databinder":
                 # needs a slightly different schema, not currently implemented
                 raise NotImplementedError("further processing of this method is not currently implemented")
-        run = processor.Runner(executor=executor,
-                       schema=schemas.NanoAODSchema,
-                       savemetrics=True,
-                       chunksize=2 ** 19,
-                      )
         tic = time.monotonic()
-        output, metrics = run(fileset, "Events", processor_instance=Q1Processor())
+        output, metrics = run(processor.Runner(executor=executor,
+                                               schema=schemas.NanoAODSchema,
+                                               savemetrics=True,
+                                               chunksize=2 ** 19,
+                                              ))
         workers = len(client.scheduler_info()['workers'])
         print('workers = ', workers, ' cores = ', 2*workers)
         toc = time.monotonic()
         walltime = toc - tic
-        return walltime/(2*workers)
-    TrackQ1.params =  ([10, 100, 500, 1000, -1])
+        ave_num_threads = metrics['processtime']/(toc-tic)
+        metrics['walltime']=walltime
+        metrics['ave_num_threads']=ave_num_threads
+        with open('output.pickle', 'wb') as fd:
+            pickle.dump(metrics, fd, protocol=pickle.HIGHEST_PROTOCOL)
+        return fd
+
+    def TrackWalltime(self,n):
+        with open('output.pickle', 'rb') as fd:
+                 run_data = pickle.load(fd)
+        return run_data['walltime']
+    TrackWalltime.param_names = ['Walltime']
