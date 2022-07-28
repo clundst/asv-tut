@@ -30,7 +30,7 @@
 
     // List of branches to benchmark. If not provided, defaults to "master"
     // (for git) or "default" (for mercurial).
-    "branches": ["master", "34c1001", "b644bcf"], // for git
+    "branches": ["master"], // for git
     // "branches": ["default"],    // for mercurial
 
     // The DVCS being used.  If not set, it will be automatically
@@ -75,6 +75,8 @@
     // via pip (with all the conda available packages installed first,
     // followed by the pip installed packages).
     //
+    
+    
     // The ``@env`` and ``@env_nobuild`` keys contain the matrix of
     // environment variables to pass to build and benchmark commands.
     // An environment will be created for every combination of the
@@ -86,15 +88,27 @@
     //
     "matrix": {
          "req": {
-	     "cabinetry": [],
-	     "vector": [],
-	     "blosc": [],
-	     "cloudpickle": ["2.0.0"],
-	     "distributed": [],
-             "xrootd": [],
-	     "psutil": [],
-             "tqdm": [],
-         },
+	    "vector": [],
+            "python-blosc": ["1.10.2"],
+            "blosc": ["1.21.0"],
+	    "cloudpickle": ["2.0.0"],
+	    "distributed": ["2022.4.0"],
+            "xrootd": [],
+            "psutil": [],
+            "tqdm": [],
+            "cabinetry": [],
+            "pip+func_adl": [],
+            "pip+servicex": [],
+            "pip+servicex-databinder": [],
+            "pip+aiostream": [],
+            "pip+func-adl-servicex": [],
+            "pip+utils": [],
+            "toolz": ["0.11.2"],
+            "numpy": ["1.21.5"],
+            "pandas": ["1.4.2"],
+            "lz4": ["4.0.0"],
+            "msgpack-python": ["1.0.3"],
+	 },
     //     "env": {"ENV_VAR_1": ["val1", "val2"]},
     //     "env_nobuild": {"ENV_VAR_2": ["val3", null]},
      },
