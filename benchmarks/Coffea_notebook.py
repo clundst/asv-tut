@@ -539,16 +539,9 @@ if PIPELINE == "servicex_databinder":
 
 
 t0 = time.time()
-class Suite:
-    timeout = 120.0
-
-    def time_range(self):
-        for i in range(1000):
-            pass
-
 if PIPELINE == "coffea":
     if USE_DASK:
-        executor = processor.DaskExecutor(client=get_client(AF))
+        executor = processor.DaskExecutor(client=get_client(AF), status=False)
     else:
         executor = processor.IterativeExecutor()
 
@@ -575,6 +568,16 @@ elif PIPELINE == "servicex_databinder":
     raise NotImplementedError("further processing of this method is not currently implemented")
     
 print(f"\nexecution took {time.time() - t0:.2f} seconds")
+
+class TimeSuite:
+    timeout = 120.0
+    params = [0, 10, 20]
+
+    def setup(self, n):
+        self.obj = range(n)
+    def time_range_iter(self, n):
+        for i in self.obj:
+            pass
 
 
 # ### Inspecting the produced histograms
