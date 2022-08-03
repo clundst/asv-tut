@@ -1,3 +1,4 @@
 .asv/results
 .asv/env
 Coffea/
+benchmarks/__pycache__

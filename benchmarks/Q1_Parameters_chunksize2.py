@@ -10,6 +10,7 @@ import pickle
 fileset = {'SingleMu' : ["root://eospublic.cern.ch//eos/root-eos/benchmark/Run2012B_SingleMu.root"]}
 
 class Suite:
+    
     def setup_cache(self):
         class Q1Processor(processor.ProcessorABC):
             def process(self, events):
@@ -26,12 +27,15 @@ class Suite:
             executor = processor.DaskExecutor(client=client, status=False)
             #executor = processor.FuturesExecutor(workers=ncores, status=False)
         else:
-            executor = processor.IterativeExecutor()
+            self.executor = processor.IterativeExecutor()
             #executor = processor.FuturesExecutor(workers=ncores, status=False)
+    
+        params = ([2 ** 17, 2 ** 18, 2 ** 19])  
+
         run = processor.Runner(executor=executor,
                             schema=schemas.NanoAODSchema,
                             savemetrics=True,
-                            chunksize=2**19,
+                            chunksize=2 ** 17,
                             )
         tic = time.monotonic()
         output, metrics = run(fileset, "Events", processor_instance=Q1Processor())
@@ -42,10 +46,11 @@ class Suite:
         ave_num_threads = metrics['processtime']/(toc-tic)
         metrics['walltime']=walltime
         metrics['ave_num_threads']=ave_num_threads
-        metrics['chunksize'] = 2**19
+        metrics['chunksize'] = 2**17
         with open('output.pickle', 'wb') as fd:
             pickle.dump(metrics, fd, protocol=pickle.HIGHEST_PROTOCOL)
         return metrics
+    
     def TrackWalltime(self, metrics):
         with open('output.pickle', 'rb') as fd:
                  run_data = pickle.load(fd)
@@ -55,24 +60,24 @@ class Suite:
         with open('output.pickle', 'rb') as fd:
             run_data = pickle.load(fd)
         return run_data['ave_num_threads']
-    TrackThreadcount.param_names = ['Average Number of Threads']
+    TrackThreadcount.param_names = ['Average Number of Threads all but useless']
     def TrackBytes(self, fd):
         with open('output.pickle', 'rb') as fd:
             run_data = pickle.load(fd)
         return run_data['bytesread']/run_data['walltime']
-    TrackBytes.param_names = ['Bytes per Second']
+    TrackBytes.param_names = ['Bytes per Second useless']
     def TrackChunksize(self, fd):
         with open('output.pickle', 'rb') as fd:
             run_data = pickle.load(fd)
         return run_data['chunksize']/run_data['walltime']
-    TrackChunksize.param_names = ['Chunksize per Second']
+    TrackChunksize.param_names = ['Chunksize per Second useless']
     def TrackBytesPerThread(self, fd):
         with open('output.pickle', 'rb') as fd:
             run_data = pickle.load(fd)
         return (run_data['bytesread']/run_data['walltime'])/run_data['ave_num_threads']
-    TrackBytesPerThread.param_names = ['Bytes per Thread']
+    TrackBytesPerThread.param_names = ['Bytes per second per thread']
     def TrackChunksizePerThread(self, fd):
         with open('output.pickle', 'rb') as fd:
             run_data = pickle.load(fd)
         return (run_data['chunksize']/run_data['walltime'])/run_data['ave_num_threads']
-    TrackChunksizePerThread.param_names = ['Chunksize per Thread']
+    TrackChunksizePerThread.param_names = ['Chunk per second per thread']
